@@ -7,6 +7,7 @@ function normal()
 end
 
 function multi()
+    local player1 = {}
     player1.mt19937 = require("mt19937")
     player1.mt19937.randomseed(100)
     local player2 = {}
