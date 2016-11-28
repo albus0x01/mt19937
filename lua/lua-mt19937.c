@@ -32,13 +32,16 @@ static int lrandom(lua_State *L){
             return luaL_error(L, "wrong number of arguments");
         }
     }
+    if(up <= low){
+        return luaL_error(L, "invalid param");
+    }
     r = r % (up - low) + low;
     lua_pushinteger(L, r);
     return 1;
 }
 
 static int lgc(lua_State *L){
-    printf("mt19937 gc");
+    // printf("mt19937 gc\n");
     mt19937 *mt = lua_touserdata(L, lua_upvalueindex(1));
     mt19937_free(mt);
     return 0;
@@ -50,12 +53,15 @@ luaopen_mt19937(lua_State *L){
     luaL_Reg l[] = {
         {"randomseed", lrandomseed},
         {"random", lrandom},
-        {"__gc", lgc},
         {NULL, NULL},
     };
     luaL_newlibtable(L, l);
     mt19937 *mt = mt19937_new();
     lua_pushlightuserdata(L, mt);
     luaL_setfuncs(L, l, 1);
+    lua_createtable(L, 0, 1);
+    lua_pushcfunction(L, lgc);
+    lua_setfield(L, -2, "__gc");
+    lua_setmetatable(L, -2);
     return 1;
 }
